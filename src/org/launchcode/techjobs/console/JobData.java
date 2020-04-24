@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by LaunchCode
@@ -74,7 +75,7 @@ public class JobData {
 
         for (HashMap<String, String> row : allJobs) {
 
-            String aValue = row.get(column);
+            String aValue = row.get(column).toLowerCase();
 
             if (aValue.contains(value)) {
                 jobs.add(row);
@@ -84,6 +85,36 @@ public class JobData {
         return jobs;
     }
 
+    /**
+     * Returns results of searching the jobs data by value, using inclusion of seartch term
+     * searches all colums if data for each result
+     *
+     * @param value Value of the field to search for
+     * @return List of all jobs matching the criteria
+     */
+    public static ArrayList<HashMap<String, String>> findByValue(String value) {
+        loadData();
+
+        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
+
+        for (HashMap<String, String> job: allJobs){
+            for (Map.Entry mapElement : job.entrySet()) {
+                String mapValue = (String)mapElement.getValue();
+
+                if(mapValue.toLowerCase().contains(value)){
+                    //System.out.println(mapValue);
+                    //System.out.println("mapvalue is " +mapValue+", search value is " + value);
+                    if (!jobs.contains(job)) {
+                        jobs.add(job);
+                    }
+
+                }
+            }
+        }
+
+
+        return jobs;
+    }
     /**
      * Read in data from a CSV file and store it in a list
      */
@@ -100,7 +131,7 @@ public class JobData {
             Reader in = new FileReader(DATA_FILE);
             CSVParser parser = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
             List<CSVRecord> records = parser.getRecords();
-            Integer numberOfColumns = records.get(0).size();
+            int numberOfColumns = records.get(0).size();
             String[] headers = parser.getHeaderMap().keySet().toArray(new String[numberOfColumns]);
 
             allJobs = new ArrayList<>();
